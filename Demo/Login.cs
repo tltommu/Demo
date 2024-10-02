@@ -20,7 +20,7 @@ namespace Demo
 
         private void Enter_Click(object sender, EventArgs e)
         {
-            SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-D9AGS5A\SQLEXPRESS;Initial Catalog=Stock;Integrated Security=True");
+            SqlConnection con = Connection.GetConnection();
             SqlDataAdapter sda = new SqlDataAdapter(@"SELECT *FROM [dbo].[Login] Where UserName='" + textBox1.Text + "' and Password = '" + textBox2.Text + "'", con);
             DataTable dt = new DataTable();
             sda.Fill(dt);

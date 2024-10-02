@@ -19,17 +19,30 @@ namespace Demo
             InitializeComponent();
         }
 
-      
 
+        bool close = true;
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
+            if (close)
+            {
+                DialogResult result = MessageBox.Show("Are you sure you want to Exit", "Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    close = false;
+                    Application.Exit();
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
+            }
         }
 
         private void productToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             Product pro = new Product();
             pro.MdiParent = this;
+            pro.StartPosition = FormStartPosition.CenterScreen;
             pro.Show();
         }
     }

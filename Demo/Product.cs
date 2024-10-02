@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace Demo
 {
     public partial class Product : Form
@@ -27,33 +28,37 @@ namespace Demo
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-D9AGS5A\SQLEXPRESS;Initial Catalog=Stock;Integrated Security=True");
-            //insert logic
-            con.Open();
-            var sqlQuery = @"";
+            if (Validation())
+            {
+                SqlConnection con = Connection.GetConnection();
+                //insert logic
+                con.Open();
+                var sqlQuery = @"";
 
-            if (IfProductExists(con, textBox1.Text))
-            {
-                sqlQuery = @"UPDATE [Skuinfo] SET [Name] = '" + textBox2.Text + "' ,[Quantity] = '" + textBox3.Text + "',[Location] = '" + textBox4.Text + "' ,[Description] = '" + textBox5.Text + "'WHERE [SkuNumber] = '" + textBox1.Text + "'";
-            }
-            else
-            {
-                sqlQuery = @"INSERT INTO [dbo].[SkuInfo]([SkuNumber],[Name],[Quantity],[Location],[Description])VALUES
+                if (IfProductExists(con, textBox1.Text))
+                {
+                    sqlQuery = @"UPDATE [Skuinfo] SET [Name] = '" + textBox2.Text + "' ,[Quantity] = '" + textBox3.Text + "',[Location] = '" + textBox4.Text + "' ,[Description] = '" + textBox5.Text + "'WHERE [SkuNumber] = '" + textBox1.Text + "'";
+                }
+                else
+                {
+                    sqlQuery = @"INSERT INTO [dbo].[SkuInfo]([SkuNumber],[Name],[Quantity],[Location],[Description])VALUES
                                                 ('" + textBox1.Text + "','" + textBox2.Text + "','" + textBox3.Text + "','" + textBox4.Text + "','" + textBox5.Text + "')";
-            }
-            SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
-            SqlCommand cmd = sqlCommand;
-            cmd.ExecuteNonQuery();
-            con.Close();
+                }
+                SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
+                SqlCommand cmd = sqlCommand;
+                cmd.ExecuteNonQuery();
+                con.Close();
 
-            //Reading Data
-            Loadingdata();
+                //Reading Data
+                Loadingdata();
+                ResetRecord();
+            }
         }
 
         
         public void Loadingdata()
         {
-            SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-D9AGS5A\SQLEXPRESS;Initial Catalog=Stock;Integrated Security=True");
+            SqlConnection con = Connection.GetConnection();
             SqlDataAdapter adapter = new SqlDataAdapter("Select * from dbo.SkuInfo", con);
             DataTable dt = new DataTable();
             adapter.Fill(dt);
@@ -85,6 +90,7 @@ namespace Demo
         }
         private void dataGridView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+            button1.Text = "Update";
             textBox1.Text = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
             textBox2.Text = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
             textBox3.Text = dataGridView1.SelectedRows[0].Cells[2].Value.ToString();
@@ -94,26 +100,78 @@ namespace Demo
 
         private void button2_Click(object sender, EventArgs e)
         {
-            SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-D9AGS5A\SQLEXPRESS;Initial Catalog=Stock;Integrated Security=True");
-            var sqlQuery = @"";
+            if (Validation()) {
+                SqlConnection con = Connection.GetConnection();
+                var sqlQuery = @"";
 
-            if (IfProductExists(con, textBox1.Text))
+                if (IfProductExists(con, textBox1.Text))
+                {
+                    con.Open();
+                    sqlQuery = @"DELETE FROM [Skuinfo] WHERE [SkuNumber] = '" + textBox1.Text + "'";
+                    SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
+                    SqlCommand cmd = sqlCommand;
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                }
+                else
+                {
+                    MessageBox.Show("SkuNumber does not exist");
+                }
+
+
+                //Reading Data
+                Loadingdata();
+                ResetRecord();
+            }
+        }
+        private void ResetRecord()
+        {
+            button1.Text = "Add";
+            textBox1.Clear();
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Clear();
+            textBox5.Clear();
+            textBox1.Focus();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ResetRecord();
+        }
+        private bool Validation()
+        {
+            bool result = false;
+            if (string.IsNullOrEmpty(textBox1.Text))
             {
-                con.Open();
-                sqlQuery = @"DELETE FROM [Skuinfo] WHERE [SkuNumber] = '" + textBox1.Text + "'";
-                SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
-                SqlCommand cmd = sqlCommand;
-                cmd.ExecuteNonQuery();
-                con.Close();
+                errorProvider1.Clear();
+                errorProvider1.SetError(textBox1, "SkuNumber Required");
+            }
+            else if (string.IsNullOrEmpty(textBox2.Text))
+            {
+                errorProvider1.Clear();
+                errorProvider1.SetError(textBox2, "Name Required");
+            }
+            else if (string.IsNullOrEmpty(textBox3.Text))
+            {
+                errorProvider1.Clear();
+                errorProvider1.SetError(textBox3, "Quantity Required");
+            }
+            else if(string.IsNullOrEmpty(textBox4.Text))
+            {
+                errorProvider1.Clear();
+                errorProvider1.SetError(textBox4, "Location Required");
+            }
+            else if(string.IsNullOrEmpty(textBox5.Text))
+            {
+                errorProvider1.Clear();
+                errorProvider1.SetError(textBox5, "Description Required");
             }
             else
             {
-                MessageBox.Show("SkuNumber does not exist");
+                result = true;
             }
-            
-
-            //Reading Data
-            Loadingdata();
+            return result;
         }
     }
     
