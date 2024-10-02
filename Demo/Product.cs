@@ -37,18 +37,18 @@ namespace Demo
 
                 if (IfProductExists(con, textBox1.Text))
                 {
-                    sqlQuery = @"UPDATE [Skuinfo] SET [Name] = '" + textBox2.Text + "' ,[Quantity] = '" + textBox3.Text + "',[Location] = '" + textBox4.Text + "' ,[Description] = '" + textBox5.Text + "'WHERE [SkuNumber] = '" + textBox1.Text + "'";
+                    sqlQuery = @"UPDATE [Skuinfo] SET [Name] = '" + textBox2.Text + "' ,[Quantity] = '" + textBox3.Text + "',[Location] = '" + textBox4.Text + "' ,[Description] = '" + textBox5.Text +"',[Date] = '" +dateTimePicker1.Value.ToString()  +"' WHERE [SkuNumber] = '" + textBox1.Text + "'";
                 }
                 else
                 {
-                    sqlQuery = @"INSERT INTO [dbo].[SkuInfo]([SkuNumber],[Name],[Quantity],[Location],[Description])VALUES
-                                                ('" + textBox1.Text + "','" + textBox2.Text + "','" + textBox3.Text + "','" + textBox4.Text + "','" + textBox5.Text + "')";
+                    sqlQuery = @"INSERT INTO [dbo].[SkuInfo]([SkuNumber],[Name],[Quantity],[Location],[Description],[Date])VALUES
+                                                ('" + textBox1.Text + "','" + textBox2.Text + "','" + textBox3.Text + "','" + textBox4.Text + "','" + textBox5.Text + "','" + dateTimePicker1.Value.ToString() + "')";
                 }
                 SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
                 SqlCommand cmd = sqlCommand;
                 cmd.ExecuteNonQuery();
                 con.Close();
-
+                MessageBox.Show("Record saved successfully");
                 //Reading Data
                 Loadingdata();
                 ResetRecord();
@@ -66,11 +66,12 @@ namespace Demo
             foreach (DataRow item in dt.Rows)
             {
                 int n = dataGridView1.Rows.Add();
-                dataGridView1.Rows[n].Cells[0].Value = item["SkuNumber"].ToString();
-                dataGridView1.Rows[n].Cells[1].Value = item["Name"].ToString();
-                dataGridView1.Rows[n].Cells[2].Value = item["Quantity"].ToString();
-                dataGridView1.Rows[n].Cells[3].Value = item["Location"].ToString();
-                dataGridView1.Rows[n].Cells[4].Value = item["Description"].ToString();
+                dataGridView1.Rows[n].Cells[0].Value = item["Date"].ToString();
+                dataGridView1.Rows[n].Cells[1].Value = item["SkuNumber"].ToString();
+                dataGridView1.Rows[n].Cells[2].Value = item["Name"].ToString();
+                dataGridView1.Rows[n].Cells[3].Value = item["Quantity"].ToString();
+                dataGridView1.Rows[n].Cells[4].Value = item["Location"].ToString();
+                dataGridView1.Rows[n].Cells[5].Value = item["Description"].ToString();
             }
         }
 
@@ -91,41 +92,47 @@ namespace Demo
         private void dataGridView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             button1.Text = "Update";
-            textBox1.Text = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
-            textBox2.Text = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
-            textBox3.Text = dataGridView1.SelectedRows[0].Cells[2].Value.ToString();
-            textBox4.Text = dataGridView1.SelectedRows[0].Cells[3].Value.ToString();
-            textBox5.Text = dataGridView1.SelectedRows[0].Cells[4].Value.ToString();
+            textBox1.Text = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+            textBox2.Text = dataGridView1.SelectedRows[0].Cells[2].Value.ToString();
+            textBox3.Text = dataGridView1.SelectedRows[0].Cells[3].Value.ToString();
+            textBox4.Text = dataGridView1.SelectedRows[0].Cells[4].Value.ToString();
+            textBox5.Text = dataGridView1.SelectedRows[0].Cells[5].Value.ToString();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (Validation()) {
-                SqlConnection con = Connection.GetConnection();
-                var sqlQuery = @"";
-
-                if (IfProductExists(con, textBox1.Text))
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete", "Message", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                if (Validation())
                 {
-                    con.Open();
-                    sqlQuery = @"DELETE FROM [Skuinfo] WHERE [SkuNumber] = '" + textBox1.Text + "'";
-                    SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
-                    SqlCommand cmd = sqlCommand;
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                }
-                else
-                {
-                    MessageBox.Show("SkuNumber does not exist");
-                }
+                    SqlConnection con = Connection.GetConnection();
+                    var sqlQuery = @"";
+
+                    if (IfProductExists(con, textBox1.Text))
+                    {
+                        con.Open();
+                        sqlQuery = @"DELETE FROM [Skuinfo] WHERE [SkuNumber] = '" + textBox1.Text + "'";
+                        SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
+                        SqlCommand cmd = sqlCommand;
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("SkuNumber does not exist");
+                    }
 
 
-                //Reading Data
-                Loadingdata();
-                ResetRecord();
+                    //Reading Data
+                    Loadingdata();
+                    ResetRecord();
+                }
             }
         }
         private void ResetRecord()
         {
+            dateTimePicker1.Value = DateTime.Now;
             button1.Text = "Add";
             textBox1.Clear();
             textBox2.Clear();
@@ -172,6 +179,62 @@ namespace Demo
                 result = true;
             }
             return result;
+        }
+
+        private void dateTimePicker1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                textBox1.Focus();
+            }
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && textBox1!=null)
+            {
+                textBox2.Focus();
+            }
+            else
+            {
+                textBox1.Focus();
+            }
+        }
+
+        private void textBox2_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && textBox1 != null)
+            {
+                textBox3.Focus();
+            }
+            else
+            {
+                textBox2.Focus();
+            }
+        }
+
+        private void textBox3_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && textBox1 != null)
+            {
+                textBox4.Focus();
+            }
+            else
+            {
+                textBox3.Focus();
+            }
+        }
+
+        private void textBox4_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && textBox1 != null)
+            {
+                textBox5.Focus();
+            }
+            else
+            {
+                textBox4.Focus();
+            }
         }
     }
     

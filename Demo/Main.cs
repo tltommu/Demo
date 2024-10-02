@@ -45,5 +45,13 @@ namespace Demo
             pro.StartPosition = FormStartPosition.CenterScreen;
             pro.Show();
         }
+
+        private void stockToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stock stk = new Stock();
+            stk.MdiParent = this;
+            stk.StartPosition = FormStartPosition.CenterScreen;
+            stk.Show();
+        }
     }
 }
