@@ -24,38 +24,112 @@ namespace Demo
             Loadingdata();
         }
 
-        
+
 
         private void button1_Click(object sender, EventArgs e)
         {
             if (Validation())
             {
-                SqlConnection con = Connection.GetConnection();
-                //insert logic
-                con.Open();
-                var sqlQuery = @"";
+                using (SqlConnection con = Connection.GetConnection())
+                {
+                    con.Open();
+                    string sqlQuery = "";
 
-                if (IfProductExists(con, textBox1.Text))
-                {
-                    sqlQuery = @"UPDATE [Skuinfo] SET [Name] = '" + textBox2.Text + "' ,[Quantity] = '" + textBox3.Text + "',[Location] = '" + textBox4.Text + "' ,[Description] = '" + textBox5.Text +"',[Date] = '" +dateTimePicker1.Value.ToString()  +"' WHERE [SkuNumber] = '" + textBox1.Text + "'";
+                    if (IfProductUpdateName(con, textBox1.Text, textBox3.Text, textBox4.Text, textBox5.Text))
+                    {
+                        if (ConfirmUpdate("Name"))
+                        {
+                            sqlQuery = @"UPDATE [Skuinfo] SET [Name] = @Name, [Date] = @Date 
+                                 WHERE [SkuNumber] = @SkuNumber AND [Quantity] = @Quantity 
+                                 AND [Location] = @Location AND [Description] = @Description";
+                            ExecuteUpdate(con, sqlQuery, textBox2.Text, textBox1.Text, textBox3.Text, textBox4.Text, textBox5.Text, dateTimePicker1.Value);
+                        }
+                    }
+                    else if (IfProductUpdateQuantity(con, textBox1.Text, textBox2.Text, textBox4.Text, textBox5.Text))
+                    {
+                        if (ConfirmUpdate("Quantity"))
+                        {
+                            sqlQuery = @"UPDATE [Skuinfo] SET [Quantity] = @Quantity, [Date] = @Date 
+                                 WHERE [SkuNumber] = @SkuNumber AND [Name] = @Name 
+                                 AND [Location] = @Location AND [Description] = @Description";
+                            ExecuteUpdate(con, sqlQuery, textBox2.Text, textBox1.Text, textBox3.Text, textBox4.Text, textBox5.Text, dateTimePicker1.Value);
+                        }
+                    }
+                    else if (IfProductUpdateLocation(con, textBox1.Text, textBox2.Text, textBox3.Text, textBox5.Text))
+                    {
+                        if (ConfirmUpdate("Location"))
+                        {
+                            sqlQuery = @"UPDATE [Skuinfo] SET [Location] = @Location, [Date] = @Date 
+                                 WHERE [SkuNumber] = @SkuNumber AND [Name] = @Name 
+                                 AND [Quantity] = @Quantity AND [Description] = @Description";
+                            ExecuteUpdate(con, sqlQuery, textBox2.Text, textBox1.Text, textBox3.Text, textBox4.Text, textBox5.Text, dateTimePicker1.Value);
+                        }
+                    }
+                    else if (IfProductUpdateDescription(con, textBox1.Text, textBox2.Text, textBox3.Text, textBox4.Text))
+                    {
+                        if (ConfirmUpdate("Description"))
+                        {
+                            sqlQuery = @"UPDATE [Skuinfo] SET [Description] = @Description, [Date] = @Date 
+                                 WHERE [SkuNumber] = @SkuNumber AND [Name] = @Name 
+                                 AND [Quantity] = @Quantity AND [Location] = @Location";
+                            ExecuteUpdate(con, sqlQuery, textBox2.Text, textBox1.Text, textBox3.Text, textBox4.Text, textBox5.Text, dateTimePicker1.Value);
+                        }
+                    }
+                    else
+                    {
+                        sqlQuery = @"INSERT INTO [dbo].[SkuInfo]([SkuNumber], [Name], [Quantity], [Location], [Description], [Date])
+                             VALUES (@SkuNumber, @Name, @Quantity, @Location, @Description, @Date)";
+                        ExecuteInsert(con, sqlQuery, textBox1.Text, textBox2.Text, textBox3.Text, textBox4.Text, textBox5.Text, dateTimePicker1.Value);
+                    }
+
+                    MessageBox.Show("Record saved successfully");
+                    Loadingdata();
+                    ResetRecord();
                 }
-                else
-                {
-                    sqlQuery = @"INSERT INTO [dbo].[SkuInfo]([SkuNumber],[Name],[Quantity],[Location],[Description],[Date])VALUES
-                                                ('" + textBox1.Text + "','" + textBox2.Text + "','" + textBox3.Text + "','" + textBox4.Text + "','" + textBox5.Text + "','" + dateTimePicker1.Value.ToString() + "')";
-                }
-                SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
-                SqlCommand cmd = sqlCommand;
-                cmd.ExecuteNonQuery();
-                con.Close();
-                MessageBox.Show("Record saved successfully");
-                //Reading Data
-                Loadingdata();
-                ResetRecord();
             }
         }
 
-        
+        // Function to confirm the update process with the user
+        private bool ConfirmUpdate(string field)
+        {
+            DialogResult dialogResult = MessageBox.Show($"Are you sure you want to Update {field}?", "Message", MessageBoxButtons.YesNo);
+            return dialogResult == DialogResult.Yes;
+        }
+
+        // Function to execute an update operation
+        private void ExecuteUpdate(SqlConnection con, string sqlQuery, string Name, string SkuNumber, string Quantity, string Location, string Description, DateTime Date)
+        {
+            using (SqlCommand cmd = new SqlCommand(sqlQuery, con))
+            {
+                cmd.Parameters.AddWithValue("@Name", Name);
+                cmd.Parameters.AddWithValue("@SkuNumber", SkuNumber);
+                cmd.Parameters.AddWithValue("@Quantity", Quantity);
+                cmd.Parameters.AddWithValue("@Location", Location);
+                cmd.Parameters.AddWithValue("@Description", Description);
+                cmd.Parameters.AddWithValue("@Date", Date);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        // Function to execute an insert operation
+        private void ExecuteInsert(SqlConnection con, string sqlQuery, string SkuNumber, string Name, string Quantity, string Location, string Description, DateTime Date)
+        {
+            using (SqlCommand cmd = new SqlCommand(sqlQuery, con))
+            {
+                cmd.Parameters.AddWithValue("@SkuNumber", SkuNumber);
+                cmd.Parameters.AddWithValue("@Name", Name);
+                cmd.Parameters.AddWithValue("@Quantity", Quantity);
+                cmd.Parameters.AddWithValue("@Location", Location);
+                cmd.Parameters.AddWithValue("@Description", Description);
+                cmd.Parameters.AddWithValue("@Date", Date);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+
         public void Loadingdata()
         {
             SqlConnection con = Connection.GetConnection();
@@ -66,12 +140,106 @@ namespace Demo
             foreach (DataRow item in dt.Rows)
             {
                 int n = dataGridView1.Rows.Add();
-                dataGridView1.Rows[n].Cells[0].Value = item["Date"].ToString();
+                dataGridView1.Rows[n].Cells[0].Value = Convert.ToDateTime(item["Date"].ToString()).ToString("dd/MM/yyyy");
                 dataGridView1.Rows[n].Cells[1].Value = item["SkuNumber"].ToString();
                 dataGridView1.Rows[n].Cells[2].Value = item["Name"].ToString();
                 dataGridView1.Rows[n].Cells[3].Value = item["Quantity"].ToString();
                 dataGridView1.Rows[n].Cells[4].Value = item["Location"].ToString();
                 dataGridView1.Rows[n].Cells[5].Value = item["Description"].ToString();
+            }
+            if (dataGridView1.Rows.Count > 0)
+            {
+                label1.Text=dataGridView1.Rows.Count.ToString();
+                float totalQuantity = 0;
+                for(int i = 0; i< dataGridView1.Rows.Count; ++i)
+                {
+                    totalQuantity += float.Parse(dataGridView1.Rows[i].Cells["Column3"].Value.ToString());
+                    label6.Text = totalQuantity.ToString();
+                }
+            }
+            else
+            {
+                label1.Text = "0";
+                label6.Text = "0";
+            }
+            if (dataGridView3.Rows.Count > 0)
+            {
+                label10.Text = dataGridView3.Rows.Count.ToString();
+                float ProductQuantity = 0;
+                for (int i = 0; i < dataGridView3.Rows.Count; ++i)
+                {
+                    ProductQuantity += float.Parse(dataGridView3.Rows[i].Cells["Quantity"].Value.ToString());
+                    label12.Text = ProductQuantity.ToString();
+                }
+
+            }
+            else
+            {
+                label10.Text = "0";
+                label12.Text = "0";
+            }
+
+        }
+
+        private bool IfProductUpdateName(SqlConnection con, string SkuNumber, string Quantity, string Location, string Description)
+        {
+            SqlDataAdapter adapter = new SqlDataAdapter("Select 1 from dbo.SkuInfo WHERE [SkuNumber]= '" + SkuNumber + "'AND [Quantity]='" + Quantity + "'And[Location]='" + Location + "'AND [Description]='" + Description + "'", con);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+            if (dt.Rows.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        private bool IfProductUpdateQuantity(SqlConnection con, string SkuNumber, string Name, string Location, string Description)
+        {
+            SqlDataAdapter adapter = new SqlDataAdapter("Select 1 from dbo.SkuInfo WHERE [SkuNumber]= '" + SkuNumber + "'AND [Name]='" + Name + "'AND [Location]='" + Location + "'And[Description]='" + Description + "'", con);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+            if (dt.Rows.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool IfProductUpdateLocation(SqlConnection con, string SkuNumber, string Name, string Quantity, string Description)
+        {
+            SqlDataAdapter adapter = new SqlDataAdapter("Select 1 from dbo.SkuInfo WHERE [SkuNumber]= '" + SkuNumber + "'AND [Name]='" + Name + "'AND [Quantity]='" + Quantity + "'And[Description]='" + Description + "'", con);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+            if (dt.Rows.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        
+        private bool IfProductUpdateDescription(SqlConnection con, string SkuNumber, string Name, string Quantity, string Location)
+        {
+            SqlDataAdapter adapter = new SqlDataAdapter("Select 1 from dbo.SkuInfo WHERE [SkuNumber]= '" + SkuNumber + "'AND [Name]='" + Name + "'AND [Quantity]='" + Quantity + "'And[Location]='" + Location + "'", con);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+            if (dt.Rows.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -112,11 +280,12 @@ namespace Demo
                     if (IfProductExists(con, textBox1.Text))
                     {
                         con.Open();
-                        sqlQuery = @"DELETE FROM [Skuinfo] WHERE [SkuNumber] = '" + textBox1.Text + "'";
+                        sqlQuery = @"DELETE FROM [Skuinfo] WHERE [SkuNumber]= '" + textBox1.Text + "'AND [Name]='" + textBox2.Text + "'AND [Quantity]='" + textBox3.Text + "'And[Location]='" + textBox4.Text + "'And[Description]='" + textBox5.Text + "'";
                         SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
                         SqlCommand cmd = sqlCommand;
                         cmd.ExecuteNonQuery();
                         con.Close();
+                        MessageBox.Show("Record deleted successfully");
                     }
                     else
                     {
@@ -193,7 +362,9 @@ namespace Demo
         {
             if (e.KeyCode == Keys.Enter && textBox1!=null)
             {
-                textBox2.Focus();
+                textBox1.Text = dataGridView2.SelectedRows[0].Cells[0].Value.ToString();
+                textBox2.Text = dataGridView2.SelectedRows[0].Cells[1].Value.ToString();
+                textBox3.Focus();
             }
             else
             {
@@ -236,6 +407,26 @@ namespace Demo
                 textBox4.Focus();
             }
         }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox1 != null)
+            {
+                SqlConnection con = Connection.GetConnection();
+                con.Open();
+                SqlDataAdapter sda1 = new SqlDataAdapter("Select SkuNumber, Name From [SkuStatus] Where [SkuNumber] Like '" + textBox1.Text + "%'", con);
+                DataTable dt1 = new DataTable();
+                sda1.Fill(dt1);
+                dataGridView2.DataSource = dt1;
+                SqlDataAdapter sda2 = new SqlDataAdapter("Select SkuNumber, Name, Quantity, Location, Description From [SkuInfo] Where [SkuNumber] Like '"+textBox1.Text+"%'", con);
+                DataTable dt2 = new DataTable();
+                sda2.Fill(dt2);
+                dataGridView3.DataSource = dt2;
+                Loadingdata();
+            }
+        }
+
+        
     }
     
 }

@@ -115,6 +115,7 @@ namespace Demo
                         SqlCommand cmd = sqlCommand;
                         cmd.ExecuteNonQuery();
                         con.Close();
+                        MessageBox.Show("Record deleted successfully");
                     }
                     else
                     {
