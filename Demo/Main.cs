@@ -40,7 +40,7 @@ namespace Demo
 
         private void productToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            Product pro = new Product();
+            Stock pro = new Stock();
             pro.MdiParent = this;
             pro.StartPosition = FormStartPosition.CenterScreen;
             pro.Show();
@@ -48,7 +48,7 @@ namespace Demo
 
         private void stockToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Stock stk = new Stock();
+            Product stk = new Product();
             stk.MdiParent = this;
             stk.StartPosition = FormStartPosition.CenterScreen;
             stk.Show();
