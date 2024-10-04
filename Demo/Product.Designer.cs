@@ -140,7 +140,7 @@
             this.textBox2.Location = new System.Drawing.Point(223, 29);
             this.textBox2.Margin = new System.Windows.Forms.Padding(4);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(211, 27);
+            this.textBox2.Size = new System.Drawing.Size(210, 27);
             this.textBox2.TabIndex = 4;
             // 
             // comboBox1
@@ -152,10 +152,10 @@
             this.comboBox1.Items.AddRange(new object[] {
             "Active",
             "Deactive"});
-            this.comboBox1.Location = new System.Drawing.Point(442, 29);
+            this.comboBox1.Location = new System.Drawing.Point(441, 29);
             this.comboBox1.Margin = new System.Windows.Forms.Padding(4);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(211, 24);
+            this.comboBox1.Size = new System.Drawing.Size(212, 24);
             this.comboBox1.TabIndex = 5;
             // 
             // label1
@@ -182,7 +182,7 @@
             this.label2.Location = new System.Drawing.Point(223, 0);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(211, 25);
+            this.label2.Size = new System.Drawing.Size(210, 25);
             this.label2.TabIndex = 7;
             this.label2.Text = "Name";
             // 
@@ -193,10 +193,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("PMingLiU", 12F);
-            this.label3.Location = new System.Drawing.Point(442, 0);
+            this.label3.Location = new System.Drawing.Point(441, 0);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(211, 25);
+            this.label3.Size = new System.Drawing.Size(212, 25);
             this.label3.TabIndex = 8;
             this.label3.Text = "Status";
             // 
@@ -253,7 +253,7 @@
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(360, 37);
             this.tableLayoutPanel2.TabIndex = 11;
             // 
