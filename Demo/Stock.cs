@@ -109,6 +109,7 @@ namespace Demo
                 cmd.Parameters.AddWithValue("@Date", Date);
 
                 cmd.ExecuteNonQuery();
+                Loadingdata();
             }
         }
 
@@ -125,6 +126,7 @@ namespace Demo
                 cmd.Parameters.AddWithValue("@Date", Date);
 
                 cmd.ExecuteNonQuery();
+                Loadingdata();
             }
         }
 
@@ -308,6 +310,7 @@ namespace Demo
             textBox3.Clear();
             textBox4.Clear();
             textBox5.Clear();
+            textBox7.Clear();
             textBox1.Focus();
         }
 
@@ -423,6 +426,28 @@ namespace Demo
                 sda2.Fill(dt2);
                 dataGridView3.DataSource = dt2;
                 Loadingdata();
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            using (SqlConnection con = Connection.GetConnection())
+            {
+                if (IfProductUpdateQuantity(con, textBox1.Text, textBox2.Text, textBox4.Text, textBox5.Text))
+                {
+                    DialogResult dialogResult = MessageBox.Show($"Are you sure you want to Export?", "Message", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        con.Open();
+                        string sqlQuery = @"UPDATE [Skuinfo] SET [Quantity] = @Quantity, [Date] = @Date 
+                                 WHERE [SkuNumber] = @SkuNumber AND [Name] = @Name 
+                                 AND [Location] = @Location AND [Description] = @Description";
+                        int Stockqty = Int32.Parse(textBox3.Text) - Int32.Parse(textBox7.Text);
+                        ExecuteUpdate(con, sqlQuery, textBox2.Text, textBox1.Text, Stockqty.ToString(), textBox4.Text, textBox5.Text, dateTimePicker1.Value);
+                        Loadingdata();
+                        ResetRecord();
+                    }
+                }
             }
         }
 
