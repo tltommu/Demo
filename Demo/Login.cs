@@ -13,6 +13,7 @@ namespace Demo
 {
     public partial class Login : Form
     {
+        public static string UserName = "1";
         public Login()
         {
             InitializeComponent();
@@ -34,6 +35,7 @@ namespace Demo
                 MessageBox.Show("Invalid Login", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Clear_Click(sender, e);
             }
+                     
         }
 
         private void Clear_Click(object sender, EventArgs e)
@@ -42,6 +44,11 @@ namespace Demo
             textBox1.Text = "";
             textBox2.Text = "";
             textBox1.Focus();
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            MessageBox.Show("Contact your database administrator");
         }
     }
 }

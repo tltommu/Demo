@@ -53,5 +53,21 @@ namespace Demo
             stk.StartPosition = FormStartPosition.CenterScreen;
             stk.Show();
         }
+
+        private void productListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ReportForm.ProductReport prod = new ReportForm.ProductReport();
+            prod.MdiParent = this;
+            prod.StartPosition = FormStartPosition.CenterScreen;
+            prod.Show();
+        }
+
+        private void stockListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ReportForm.StockReport Stock = new ReportForm.StockReport();
+            Stock.MdiParent = this;
+            Stock.StartPosition = FormStartPosition.CenterScreen;
+            Stock.Show();
+        }
     }
 }

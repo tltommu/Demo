@@ -125,6 +125,7 @@ namespace Demo
                 cmd.Parameters.AddWithValue("@Description", Description);
                 cmd.Parameters.AddWithValue("@Date", Date);
 
+
                 cmd.ExecuteNonQuery();
                 Loadingdata();
             }
@@ -417,7 +418,7 @@ namespace Demo
             {
                 SqlConnection con = Connection.GetConnection();
                 con.Open();
-                SqlDataAdapter sda1 = new SqlDataAdapter("Select SkuNumber, Name From [SkuStatus] Where [SkuNumber] Like '" + textBox1.Text + "%'", con);
+                SqlDataAdapter sda1 = new SqlDataAdapter("Select SkuNumber, ProductType From [SkuStatus] Where [SkuNumber] Like '" + textBox1.Text + "%'", con);
                 DataTable dt1 = new DataTable();
                 sda1.Fill(dt1);
                 dataGridView2.DataSource = dt1;
@@ -436,7 +437,7 @@ namespace Demo
                 if (IfProductUpdateQuantity(con, textBox1.Text, textBox2.Text, textBox4.Text, textBox5.Text))
                 {
                     DialogResult dialogResult = MessageBox.Show($"Are you sure you want to Export?", "Message", MessageBoxButtons.YesNo);
-                    if (dialogResult == DialogResult.Yes)
+                    if (dialogResult == DialogResult.Yes && Int32.Parse(textBox3.Text)>Int32.Parse(textBox7.Text))
                     {
                         con.Open();
                         string sqlQuery = @"UPDATE [Skuinfo] SET [Quantity] = @Quantity, [Date] = @Date 
@@ -445,13 +446,63 @@ namespace Demo
                         int Stockqty = Int32.Parse(textBox3.Text) - Int32.Parse(textBox7.Text);
                         ExecuteUpdate(con, sqlQuery, textBox2.Text, textBox1.Text, Stockqty.ToString(), textBox4.Text, textBox5.Text, dateTimePicker1.Value);
                         Loadingdata();
-                        ResetRecord();
                     }
+                    else if (Int32.Parse(textBox3.Text) == Int32.Parse(textBox7.Text) && dialogResult==DialogResult.Yes)
+                    {
+                        con.Open();
+                        string sqlQuery = @"UPDATE [Skuinfo] SET [Quantity] = @Quantity, [Date] = @Date 
+                                 WHERE [SkuNumber] = @SkuNumber AND [Name] = @Name 
+                                 AND [Location] = @Location AND [Description] = @Description";
+                        string sqlQuery2 = @"INSERT INTO [dbo].[SkuExport1]([SkuNumber], [Name], [Quantity], [Location], [Description], [Date], [ExportQuantity])
+                             VALUES (@SkuNumber, @Name, @Quantity, @Location, @Description, @Date, @ExportQuantity)";
+                        ExecuteInsertSkuExport(con, sqlQuery2, textBox1.Text, textBox2.Text, textBox3.Text, textBox4.Text, textBox5.Text, dateTimePicker1.Value, textBox7.Text);
+                        int Stockqty = Int32.Parse(textBox3.Text) - Int32.Parse(textBox7.Text);
+                        ExecuteUpdate(con, sqlQuery, textBox2.Text, textBox1.Text, Stockqty.ToString(), textBox4.Text, textBox5.Text, dateTimePicker1.Value);
+                        string sqlQuery3 = @"Delete FROM [dbo].[SkuInfo] WHERE [Quantity]='0' ";
+                        SqlCommand sqlCommand = new SqlCommand(sqlQuery3, con);
+                        SqlCommand cmd = sqlCommand;
+                        cmd.ExecuteNonQuery();
+                        Loadingdata();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Export Cancelled");
+                    }
+                    if (textBox1.Text != null && textBox2.Text != null && textBox3.Text != null && textBox4.Text != null && textBox5.Text != null && textBox7.Text != null && Int32.Parse(textBox3.Text) > Int32.Parse(textBox7.Text))
+                    {
+                        string sqlQuery2 = @"INSERT INTO [dbo].[SkuExport1]([SkuNumber], [Name], [Quantity], [Location], [Description], [Date], [ExportQuantity])
+                             VALUES (@SkuNumber, @Name, @Quantity, @Location, @Description, @Date, @ExportQuantity)";
+                        ExecuteInsertSkuExport(con, sqlQuery2, textBox1.Text, textBox2.Text, textBox3.Text, textBox4.Text, textBox5.Text, dateTimePicker1.Value, textBox7.Text);
+                    }
+                    ResetRecord();
                 }
             }
         }
 
-        
+        private void dataGridView3_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            textBox1.Text = dataGridView3.SelectedRows[0].Cells["SkuNumber"].Value.ToString();
+            textBox2.Text = dataGridView3.SelectedRows[0].Cells["Name"].Value.ToString();
+            textBox3.Text = dataGridView3.SelectedRows[0].Cells["Quantity"].Value.ToString();
+            textBox4.Text = dataGridView3.SelectedRows[0].Cells["Location"].Value.ToString();
+            textBox5.Text = dataGridView3.SelectedRows[0].Cells["Description"].Value.ToString();
+        }
+        private void ExecuteInsertSkuExport(SqlConnection con, string sqlQuery, string SkuNumber, string Name, string Quantity, string Location, string Description, DateTime Date, string ExportQuantity)
+        {
+            using (SqlCommand cmd = new SqlCommand(sqlQuery, con))
+            {
+                cmd.Parameters.AddWithValue("@SkuNumber", SkuNumber);
+                cmd.Parameters.AddWithValue("@Name", Name);
+                cmd.Parameters.AddWithValue("@Quantity", Quantity);
+                cmd.Parameters.AddWithValue("@Location", Location);
+                cmd.Parameters.AddWithValue("@Description", Description);
+                cmd.Parameters.AddWithValue("@Date", Date);
+                cmd.Parameters.AddWithValue("@ExportQuantity", ExportQuantity);
+                cmd.ExecuteNonQuery();
+                Loadingdata();
+            }
+        }
+
     }
     
 }

@@ -38,12 +38,12 @@ namespace Demo
 
                 if (IfProductExists(con, textBox1.Text))
                 {
-                    sqlQuery = @"UPDATE [SkuStatus] SET [Name] = '" + textBox2.Text + "' ,[Status]='" + status + "'WHERE [SkuNumber] = '" + textBox1.Text + "'";
+                    sqlQuery = @"UPDATE [SkuStatus] SET [ProductType] = '" + textBox2.Text + "' ,[Status]='" + status + "',[Weight]='" + textBox3.Text + "',[Material]='" + textBox4.Text + "',[ElectroPlating]='" + textBox5.Text + "',[Remark]='" + textBox6.Text + "',[SalePriceBronze]='" + textBox7.Text + "',[SalePriceSilver]='" + textBox8.Text + "'WHERE [SkuNumber] = '" + textBox1.Text + "'";
                 }
                 else
                 {
-                    sqlQuery = @"INSERT INTO [dbo].[SkuStatus]([SkuNumber],[Name],[Status])VALUES
-                                                ('" + textBox1.Text + "','" + textBox2.Text + "','" + status + "')";
+                    sqlQuery = @"INSERT INTO [dbo].[SkuStatus]([SkuNumber],[ProductType],[Status],[Weight],[Material],[Electroplating],[Remark],[SalePriceBronze],[SalePriceSilver])VALUES
+                                                ('" + textBox1.Text + "','" + textBox2.Text + "','" + status + "','" + textBox3.Text + "','" + textBox4.Text + "','" + textBox5.Text + "','" + textBox6.Text + "','" + textBox7.Text + "','" + textBox8.Text + "')";
                 }
                 SqlCommand sqlCommand = new SqlCommand(sqlQuery, con);
                 SqlCommand cmd = sqlCommand;
@@ -68,15 +68,21 @@ namespace Demo
             {
                 int n = dataGridView1.Rows.Add();
                 dataGridView1.Rows[n].Cells[0].Value = item["SkuNumber"].ToString();
-                dataGridView1.Rows[n].Cells[1].Value = item["Name"].ToString();
+                dataGridView1.Rows[n].Cells[1].Value = item["ProductType"].ToString();
                 if ((bool)item["Status"])
                 {
-                    dataGridView1.Rows[n].Cells[2].Value = "Active";
+                    dataGridView1.Rows[n].Cells[8].Value = "Active";
                 }
                 else
                 {
-                    dataGridView1.Rows[n].Cells[2].Value = "Deactive";
+                    dataGridView1.Rows[n].Cells[8].Value = "Deactive";
                 }
+                dataGridView1.Rows[n].Cells[2].Value = item["Weight"].ToString();
+                dataGridView1.Rows[n].Cells[3].Value = item["Material"].ToString();
+                dataGridView1.Rows[n].Cells[4].Value = item["Electroplating"].ToString();
+                dataGridView1.Rows[n].Cells[5].Value = item["Remark"].ToString();
+                dataGridView1.Rows[n].Cells[6].Value = item["SalePriceBronze"].ToString();
+                dataGridView1.Rows[n].Cells[7].Value = item["SalePriceSilver"].ToString();
 
             }
         }
@@ -136,6 +142,12 @@ namespace Demo
             textBox2.Clear();
             comboBox1.SelectedIndex = -1;
             textBox1.Focus();
+            textBox3.Clear();
+            textBox4.Clear();
+            textBox5.Clear();
+            textBox6.Clear();
+            textBox7.Clear();
+            textBox8.Clear();
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -153,7 +165,7 @@ namespace Demo
             else if (string.IsNullOrEmpty(textBox2.Text))
             {
                 errorProvider1.Clear();
-                errorProvider1.SetError(textBox2, "Name Required");
+                errorProvider1.SetError(textBox2, "ProductType Required");
             }
             else if (comboBox1.SelectedIndex== -1)
             {
@@ -173,7 +185,7 @@ namespace Demo
             button1.Text = "Update";
             textBox1.Text = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
             textBox2.Text = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
-            if (dataGridView1.SelectedRows[0].Cells[2].Value.ToString() == "Active")
+            if (dataGridView1.SelectedRows[0].Cells[8].Value.ToString() == "Active")
             {
                 comboBox1.SelectedIndex = 0;
             }
@@ -181,6 +193,12 @@ namespace Demo
             {
                 comboBox1.SelectedIndex = 1;
             }
+            textBox3.Text = dataGridView1.SelectedRows[0].Cells[2].Value.ToString();
+            textBox4.Text = dataGridView1.SelectedRows[0].Cells[3].Value.ToString();
+            textBox5.Text = dataGridView1.SelectedRows[0].Cells[4].Value.ToString();
+            textBox6.Text = dataGridView1.SelectedRows[0].Cells[5].Value.ToString();
+            textBox7.Text = dataGridView1.SelectedRows[0].Cells[6].Value.ToString();
+            textBox8.Text = dataGridView1.SelectedRows[0].Cells[7].Value.ToString();
         }
 
         private void Stock_Load(object sender, EventArgs e)
