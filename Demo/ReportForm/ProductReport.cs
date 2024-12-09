@@ -14,25 +14,25 @@ namespace Demo.ReportForm
 {
     public partial class ProductReport : Form
     {
-        ReportDocument cryrpt = new ReportDocument();
+        
         public ProductReport()
         {
             InitializeComponent();
         }
 
+        Product myReport1 = new Product();
         private void ProductReport_Load(object sender, EventArgs e)
         {
-            cryrpt.Load(@"C:\Users\Tommy Lam\source\repos\Demo\Demo\Reports\Product.rpt");
+            
             SqlConnection con = Connection.GetConnection();
             con.Open();
             DataSet ds = new DataSet();
             SqlDataAdapter Sdaaa = new SqlDataAdapter("Select*From[SkuStatus]", con);
             DataTable dt = new DataTable();
             Sdaaa.Fill(dt);
-            cryrpt.SetDataSource(dt);
-            crystalReportViewer1.ReportSource = cryrpt;
+            myReport1.SetDataSource(dt);
+            crystalReportViewer1.ReportSource = myReport1;
         }
 
-        
     }
 }

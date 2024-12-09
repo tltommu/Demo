@@ -69,5 +69,7 @@ namespace Demo
             Stock.StartPosition = FormStartPosition.CenterScreen;
             Stock.Show();
         }
+
+        
     }
 }
