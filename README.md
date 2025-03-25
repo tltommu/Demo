@@ -1,4 +1,4 @@
-# Basic Visual Studio  Windows Form App I created for my client as a WMS demo
+# Basic Visual Studio Windows Form App I created for my client as a WMS demo
 
 ### Techstack: C#, .NET SDK
 ### Database: SQL Server Express Database
@@ -15,6 +15,8 @@
 
 ### You need to download your crystal report from SAP online in order to use the report function and page.
 Here is the link [https://origin.softwaredownloads.sap.com/public/site/index.html](https://origin.softwaredownloads.sap.com/public/site/index.html)
+
+Select Crystal report for visual studio and install the file according to your machine/system
 
 I downloaded and installed `CRforVS6413SP36_0-80007712.exe` for my own machine for this to work.
 
